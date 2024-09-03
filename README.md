@@ -1,8 +1,5 @@
 # Prediction-of-S-P500-in-R
 
-
-# README for Stock Market Analysis in R
-
 ## Introduction
 
 This project focuses on analyzing the stock market data using various statistical and machine learning techniques in R. The dataset used is `Smarket`, which contains daily percentage returns for the S&P 500 index over a period of several years. The analysis includes data visualization, statistical summaries, logistic regression, and regularization methods like Ridge and Lasso.
