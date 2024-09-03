@@ -1,0 +1,467 @@
+library(ISLR2)
+
+
+# De 6 första raderna i Smarket
+head(Smarket)
+summary(Smarket)
+# Större volym de senaste åren
+plot(Smarket$Year,Smarket$Volume)
+
+
+# Större Varians de första åren
+plot(Smarket$Year,Smarket$Today)
+
+
+p <- ggplot(data = Smarket,
+    mapping = aes(x = Today,
+    y = Direction,
+    color = Direction))
+
+
+p + geom_point() + labs(x = "Today", y = "Direction", title = "Pris idag / direction") + scale_color_manual(values = c("Up" = "#006400", "Down" = "red"))
+
+
+# correlation exkl kvalitativa
+cor(Smarket[, -9])
+
+
+# raden n: ersätt med rad nummer
+Smarket[n,]
+
+
+# från rad n till rad m: ersätt med radnummer
+Smarket[n:m,]
+
+
+# Lag1 till Lag5
+Smarket[,2:6]
+
+
+# var 10:e rad börja från rad 50
+Smarket[seq(50, nrow(Smarket), by = 10), ]
+
+
+# åR 2004
+Smarket[Smarket$Year == 2004,]
+
+
+# åR 2001 och 2002
+Smarket[Smarket$Year == 2001 | Smarket$Year == 2002,]
+
+
+# Ta inte med år 2005
+Smarket[Smarket$Year != 2005,]
+
+
+# Alla dagar där priset har gått upp
+Smarket[Smarket$Today >= 0,]
+# Antal dagar det har gått upp
+dim(Smarket[Smarket$Today >= 0,])[1]
+
+
+# Alla dagar där priset har gått ner
+Smarket[Smarket$Today < 0,]
+# Antal dagar det har gått ner
+dim(Smarket[Smarket$Lag1 < 0,])[1]
+
+
+# correlation mellan Lag 1 och Lag 2
+cor(Smarket$Lag1,Smarket$Lag2)
+
+
+#------------------------------------------------------------------
+#------------------------------------------------------------------
+
+
+
+
+# ändringen i de senaste 1-5 dagar mha prisindex
+senaste1 <- ((1+Smarket$Today/100) * (1+Smarket$Lag1/100) - 1) * 100
+senaste2 <- ((1+Smarket$Today/100) * (1+Smarket$Lag1/100) * (1+Smarket$Lag2/100) - 1) * 100
+senaste3 <- ((1+Smarket$Today/100) * (1+Smarket$Lag1/100)*(1+Smarket$Lag2/100) * (1+Smarket$Lag3/100) - 1) * 100
+senaste4 <- ((1+Smarket$Today/100) * (1+Smarket$Lag1/100)*(1+Smarket$Lag2/100) * (1+Smarket$Lag3/100) * (1+Smarket$Lag4/100) - 1) * 100
+senaste5 <- ((1+Smarket$Today/100) * (1+Smarket$Lag1/100)*(1+Smarket$Lag2/100) * (1+Smarket$Lag3/100) * (1+Smarket$Lag4/100) * (1+Smarket$Lag5/100) - 1) * 100
+
+
+senaste1_dummy <- ifelse(senaste1 >= 0, 1, 0)
+andel1 <- mean(senaste1_dummy)   # andel "Up" den senaste dagen
+
+
+senaste2_dummy <- ifelse(senaste2 >= 0, 1, 0)
+andel2 <- mean(senaste2_dummy)   # andel "Up" de senaste 2 dagar
+
+
+senaste3_dummy <- ifelse(senaste3 >= 0, 1, 0)
+andel3 <-mean(senaste3_dummy)   # andel "Up" de senaste 3 dagar
+
+
+senaste4_dummy <- ifelse(senaste4 >= 0, 1, 0)
+andel4 <- mean(senaste4_dummy)   # andel "Up" de senaste 4 dagar
+
+
+senaste5_dummy <- ifelse(senaste5 >= 0, 1, 0)
+andel5 <- mean(senaste5_dummy)   # andel "Up" de senaste 5 dagar
+
+
+plot(1:5, c(andel1, andel2, andel3, andel4,andel5), 'o')
+
+
+# Scatter plot för kvantitativa variabler
+plot(Smarket$Today, xlab = "Dag", ylab = "Idag", col = Smarket$Direction)  
+plot(Smarket$Lag1, xlab = "Dag", ylab = "Lag1", col = Smarket$Direction)
+plot(Smarket$Lag2, xlab = "Dag", ylab = "Lag2", col = Smarket$Direction)
+plot(Smarket$Lag3, xlab = "Dag", ylab = "Lag3", col = Smarket$Direction)
+plot(Smarket$Lag4, xlab = "Dag", ylab = "Lag4", col = Smarket$Direction)
+plot(Smarket$Lag5, xlab = "Dag", ylab = "Lag5", col = Smarket$Direction)
+plot(Smarket$Volume, xlab = "Dag", ylab = "Volym", col = Smarket$Direction)
+
+
+# samma som plot
+p <- ggplot(data = Smarket,
+    mapping = aes(x = seq_along(Today),
+    y = Today,
+    xlab = "dag", ylab = "pris idag",
+    color = Year))
+p + geom_point() + labs(x="dag", y = "pris idag")
+
+
+# boxplot för kvantitativa variabler. Idag och alla Lag är lika fördelade
+boxplot(Smarket$Year, main=names(Smarket)[1])
+boxplot(Smarket$Lag1, main=names(Smarket)[2])
+boxplot(Smarket$Lag2, main=names(Smarket)[3])
+boxplot(Smarket$Lag3, main=names(Smarket)[4])
+boxplot(Smarket$Lag4, main=names(Smarket)[5])
+boxplot(Smarket$Lag5, main=names(Smarket)[6])
+boxplot(Smarket$Volume, main=names(Smarket)[7])
+boxplot(Smarket$Today, main=names(Smarket)[8])
+
+
+# antal data för varje år (lite mindre i 2001)
+barplot(table(Smarket$Year), col = c("darkblue"), xlab = "År", ylab = "frakvens")
+
+
+# stolpdiagram för
+barplot(table(Smarket$Direction) , col = c("red", "darkgreen"))
+
+
+# x: dag    y:volym     2 olika färger för upp/ner
+p <- ggplot(data = Smarket,
+    mapping = aes(x = seq_along(Today),
+    y = Volume,
+    color = Direction))
+# plotta och anpassa en linjär modell
+p + geom_point() + geom_smooth(method = "lm", se=FALSE) + labs(x = "dag", y = "Volym", title = "Smarket volym i miljarder") + scale_color_manual(values = c("Up" = "#006400", "Down" = "red"))
+
+
+# fördelningen av variabler
+hist(Smarket[,2], main=names(Smarket)[2],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+hist(Smarket[,3], main=names(Smarket)[3],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+hist(Smarket[,4], main=names(Smarket)[4],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+hist(Smarket[,5], main=names(Smarket)[5],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+hist(Smarket[,6], main=names(Smarket)[6],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+hist(Smarket[,7], main=names(Smarket)[7],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+hist(Smarket[,8], main=names(Smarket)[8],col="blue", xlab ="procentuell ändring", ylab="frekvens")
+
+
+#------------------------------------------------------------------
+#                      Test av Logistisk regression modell
+#------------------------------------------------------------------
+
+
+# inga tomma värden
+colSums(is.na(Smarket))
+
+
+# anpassa en logistisk regression modell (family = binomial för logistisk regression)
+logRegModell=glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume , data = Smarket, family=binomial)
+summary(logRegModell)
+coef(logRegModell)
+
+
+# sannolikheter att Direction ska vara Up
+sannolikheter <- predict(logRegModell, type = "response")
+
+
+# skapa dummy variabler (1 för Up och 0 För Down) för prediktion
+dummy_pred <- ifelse(sannolikheter >= 0.5 , 1, 0)
+
+
+# skapa dummy variabler (1 för Up och 0 För Down) för verkligheten
+dummy_verklig = ifelse(Smarket$Direction == "Up", 1, 0)
+
+
+# jämför prediktionen med verkligheten
+table(dummy_pred, dummy_verklig)
+
+
+#noggranhet
+mean(dummy_pred == dummy_verklig)
+
+
+#.-----------------------------------------------
+library(glmnet)
+library(pROC)
+
+
+# Dela upp data i träning och test
+train_index <- which(Smarket$Year < 2005)
+test_index <- which(Smarket$Year == 2005)
+
+
+# Skapa utökad designmatris
+large <- Smarket[, c(which(colnames(Smarket) == "Today"), setdiff(1:ncol(Smarket), which(colnames(Smarket) == "Today")))]
+verylarge <- data.frame(Today = large$Today, model.matrix(Today ~ .^2, data = large)[, -1])
+x_verylarge_train <- verylarge[train,-1]
+
+
+# Dela upp designmatrisen i träning och testdata
+x_verylarge_train <- verylarge[train_index, -1]
+x_verylarge_test <- verylarge[test_index, -1]
+y_train <- Smarket$Direction[train_index]
+y_test <- Smarket$Direction[test_index]
+
+
+###################
+#Beräkna för RIDGE
+###################
+
+
+ridge.mod=glmnet(x_verylarge_train, y_train, alpha=0, family="binomial")
+dim(coef(ridge.mod))
+plot(ridge.mod)
+
+
+set.seed(14*2)
+cv.out <- cv.glmnet(as.matrix(x_verylarge_train), y_train, alpha=0, family="binomial")
+plot(cv.out)
+ridge.lambda <- cv.out$lambda.min
+
+
+ridge.pred=predict(ridge.mod, s=ridge.lambda, newx=as.matrix(x_verylarge_test))
+out <- glmnet(as.matrix(x_verylarge_train), y_train, alpha=0, family="binomial")
+ridge.coef <- predict(out,type="coefficients",s=ridge.lambda)
+ridge.coef
+
+
+###################
+#Beräkna för LASSO
+###################
+
+
+lasso.mod=glmnet(x_verylarge_train, y_train, alpha=1, family="binomial")
+dim(coef(lasso.mod))
+plot(lasso.mod)
+
+
+set.seed(14*2)
+cv.out <- cv.glmnet(as.matrix(x_verylarge_train), y_train, alpha=1, family="binomial")
+lasso.lambda <- cv.out$lambda.min
+plot(cv.out)
+
+
+lasso.pred=predict(lasso.mod, s=lasso.lambda, newx=as.matrix(x_verylarge_test))
+out <- glmnet(as.matrix(x_verylarge_train), y_train, alpha=1, family="binomial")
+lasso.coef <- predict(out,type="coefficients",s=lasso.lambda)
+lasso.coef
+
+
+
+
+#------------------------------------------------------------------
+#                       Training och test
+#------------------------------------------------------------------
+
+
+# dela vår data i training och test
+training <- subset(Smarket, Year<2005)
+test <- subset(Smarket, Year==2005)
+dim(test)
+
+
+# skapa dummy variabler (1 för Up och 0 För Down) för verkligheten
+dummy_verklig2 = ifelse(test$Direction == "Up", 1, 0)
+
+
+logRegModell2 = glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume, data = training, family = binomial)
+summary(logRegModell2)
+sannolikheter2 = predict(logRegModell2, newdata = test, type = "response")
+dummy_pred2 = ifelse(sannolikheter2 >= 0.5 , 1, 0)
+table(dummy_pred2, dummy_verklig2)
+mean(dummy_pred2 == dummy_verklig2)  # sämre noggranhet
+
+
+#mycket sämre än att bara gissa bara "UP"
+bara_upp = ifelse(test$Direction != 0 , 1, 0)
+table(bara_upp, dummy_verklig2)
+mean(bara_upp == dummy_verklig2)
+
+
+# Testa med bara Lag1, Lag2 och Lag3
+logRegModell2 = glm(Direction ~ Lag1 + Lag2, data = training, family = binomial)
+summary(logRegModell2)
+sannolikheter2 = predict(logRegModell2, newdata = test, type = "response")
+dummy_pred2 = ifelse(sannolikheter2 >= 0.5 , 1, 0)
+table(dummy_pred2, dummy_verklig2)
+mean(dummy_pred2 == dummy_verklig2) # 59,1%
+
+
+#------------------------------------------------------------------
+#------------------------------------------------------------------
+
+
+
+
+
+
+# spara bilden
+ggsave(filename = "plot.png") # spara plottet som png
+ggsave(filename = "my_ﬁgure.pdf") # spara plottet som pdf
+
+
+
+
+
+
+set.seed(14) #Välj först slumpfaktor
+
+
+# dela vår data i training och test
+training <- subset(Smarket, Year<2005)
+test <- subset(Smarket, Year==2005)
+dim(test)
+
+
+#Spara undan beroendevariabeln för sig här väljer vi att "Today" ska vara y variablen som vi kommer att prediktera
+y_train <- training[,"Today"]
+y_test <- test[,"Today"]
+
+
+#vi sätter in våra valda variabler
+small <- Smarket[,c("Today","Lag1","Lag2","Lag3")] # vi väljer 3 variabler
+train_index <- which(Smarket$Year < 2005)
+test_index <- which(Smarket$Year >= 2005)
+
+
+# träna data
+small_train <- data.frame(y_train, model.matrix(Today ~ ., small[train_index,])[,-1])
+dim(small_train)
+
+
+#Skatta regressionsmodellen OLS
+ols_mod <- lm(data=small_train, y_train ~ .)
+summary(ols_mod)
+
+
+#PREDIKTERA OUT-OF-SAMPLE
+x_small_test  <- data.frame(model.matrix(Today ~ ., small[test_index,]))[,-1]
+dim(x_small_test)
+
+
+#Prediktera testdata
+ols_pred <- predict.lm(ols_mod,newdata=x_small_test)
+
+
+#Beräkna out-of-sample rMSPE
+sqrt(mean((ols_pred-y_test)^2))
+
+
+
+
+# Ta alla variabler, fortfarande OLS modell
+large <- Smarket[,c(which(colnames(Smarket)=="Today"),setdiff(1:ncol(Smarket),which(colnames(Smarket)=="Today")))]
+
+
+#Formatera om data så det får rätt format för att skatta modeller
+large_train <- data.frame(y_train, model.matrix(Today ~ ., large[train_index,])[,-1])
+dim(large_train)
+
+
+#Skatta regressionsmodellen med OLS
+ols_mod <- lm(data=large_train, y_train ~ .)
+summary(ols_mod)
+
+
+
+
+#PREDIKTERA OUT-OF-SAMPLE
+#Formatera om X så det får rätt format för att prediktera
+x_large_test  <- data.frame(model.matrix(Today ~ ., large[test_index,]))[,-1]
+dim(x_large_test)
+
+
+#Prediktera testdata
+ols_pred <- predict.lm(ols_mod,newdata=x_large_test)
+
+
+#Beräkna out-of-sample rMSPE
+sqrt(mean((ols_pred-y_test)^2))
+
+
+## rMSPE blir mindre när vi har med alla variabler
+
+
+
+
+###################
+#Beräkna för ridge
+###################
+x_large_train <- large_train[,-1]
+
+
+ridge.mod=glmnet(x_large_train,y_train,alpha=0)
+dim(coef(ridge.mod))
+
+
+plot(ridge.mod)
+
+
+set.seed(14*2)
+cv.out <- cv.glmnet(as.matrix(x_large_train),y_train,alpha=0)
+plot(cv.out)
+ridge.lambda <- cv.out$lambda.min
+
+
+ridge.pred=predict(ridge.mod,s=ridge.lambda,newx=as.matrix(x_large_test))
+
+
+out <- glmnet(as.matrix(x_large_train),y_train,alpha=0)
+
+
+ridge.coef <- predict(out,type="coefficients",s=ridge.lambda)
+ridge.coef
+
+
+sqrt(mean((ridge.pred-y_test)^2))
+
+
+
+
+
+
+###################
+#Beräkna för LASSO
+###################
+lasso.mod=glmnet(x_large_train,y_train,alpha=1)
+dim(coef(lasso.mod))
+
+
+plot(lasso.mod)
+
+
+set.seed(14*2)
+cv.out <- cv.glmnet(as.matrix(x_large_train),y_train,alpha=1)
+plot(cv.out)
+lasso.lambda <- cv.out$lambda.min
+
+
+lasso.pred=predict(lasso.mod,s=lasso.lambda,newx=as.matrix(x_large_test))
+
+
+out <- glmnet(as.matrix(x_large_train),y_train,alpha=1)
+
+
+lasso.coef <- predict(out,type="coefficients",s=lasso.lambda)
+lasso.coef
+
+
+sqrt(mean((lasso.pred-y_test)^2))
